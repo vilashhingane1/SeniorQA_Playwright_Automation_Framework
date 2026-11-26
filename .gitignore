@@ -1,0 +1,17 @@
+
+# Playwright
+node_modules/
+.env
+/test-result/
+/@rerun.txt
+/test-results/
+/playwright-report/
+/allure-results/
+/allure-report/
+/trace-report/*
+!/trace-report/.gitkeep
+/videos/*
+!/videos/.gitkeep
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

@@ -1,0 +1,13 @@
+{
+  "booking": {
+    "firstname": "Taylor",
+    "lastname": "Automation",
+    "totalprice": 245,
+    "depositpaid": true,
+    "bookingdates": {
+      "checkin": "2027-01-15",
+      "checkout": "2027-01-20"
+    },
+    "additionalneeds": "Breakfast"
+  }
+}

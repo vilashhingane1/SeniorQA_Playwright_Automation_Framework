@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+
+    /* Projects */
+    // "incremental": true,                              /* Save .tsbuildinfo files between compilations. */
+    // "composite": true,                                /* Enable constraints for project references. */
+    // "tsBuildInfoFile": "./.tsbuildinfo",              /* Specify the path to the .tsbuildinfo file. */
+
+    /* Language and Environment */
+    "target": "ES2020",
+    // "lib": [],
+    // "jsx": "preserve",
+
+    /* Modules */
+    "module": "commonjs",
+    "types": ["node"],
+    // "rootDir": "./",
+    // "moduleResolution": "node10",
+    "resolveJsonModule": true,
+
+    /* Emit */
+    // "noEmit": true,
+    // "outDir": "./",
+    // "sourceMap": true,
+
+    /* Interop Constraints */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+
+    /* Completeness */
+    "skipLibCheck": true
+  }
+}

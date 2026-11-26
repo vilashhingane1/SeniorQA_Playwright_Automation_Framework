@@ -1,0 +1,92 @@
+name: Playwright CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    - cron: '0 2 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      SAUCE_PASSWORD: ${{ secrets.SAUCE_PASSWORD }}
+      RESTFUL_BOOKER_USERNAME: ${{ secrets.RESTFUL_BOOKER_USERNAME }}
+      RESTFUL_BOOKER_PASSWORD: ${{ secrets.RESTFUL_BOOKER_PASSWORD }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium dependencies
+        if: github.event_name != 'schedule'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install all browser dependencies
+        if: github.event_name == 'schedule'
+        run: npx playwright install --with-deps
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Prepare report directory
+        run: mkdir -p test-result
+
+      - name: Run smoke tests
+        if: github.event_name != 'schedule'
+        run: |
+          npx playwright test --project=chromium --grep @smoke
+          npx cucumber-js --config Cucumber.ci.json --tags @smoke
+
+      - name: Run full nightly suite
+        if: github.event_name == 'schedule'
+        run: |
+          npx playwright test
+          npx cucumber-js --config Cucumber.ci.json --tags "not @manual"
+
+      - name: Upload HTML reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-reports
+          path: |
+            playwright-report/
+            test-result/cucumber-report.html
+            test-result/cucumber-report.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload traces, screenshots, and videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-artifacts
+          path: |
+            test-results/
+            trace-report/
+            videos/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Add workflow link to summary
+        if: always()
+        shell: bash
+        run: |
+          echo "## CI test results" >> "$GITHUB_STEP_SUMMARY"
+          echo "[Open this workflow run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})" >> "$GITHUB_STEP_SUMMARY"
+          echo "Download the \`html-reports\` and \`failure-artifacts\` artifacts from this run." >> "$GITHUB_STEP_SUMMARY"
